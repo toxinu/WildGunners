@@ -7,8 +7,8 @@ function Game:initialize()
 	--  2: Playing
 	--  3: Score
 	self.players = {}
-	self.state = 1
-	self.ground = 600
+	self.state = 2
+	self.ground = 450
 end
 function Game:addPlayer(player)
 	player.id = #self.players
@@ -37,10 +37,12 @@ function Game:draw(dt)
 		Game:drawMenu()
 	elseif self.state == 2 then
 		love.graphics.setColor(0, 100, 100)
-    	love.graphics.rectangle('fill', 0, 100, 480, 600)
+    	love.graphics.rectangle(
+    		'fill', 0, 100,
+    		love.graphics.getWidth(), love.graphics.getHeight())
 	    love.graphics.setColor(0, 255, 255)
 	    love.graphics.setLineStyle('rough')
-	    love.graphics.line(0, self.ground, 480, self.ground)
+	    love.graphics.line(0, self.ground, love.graphics.getWidth(), self.ground)
 
 		for _, player in ipairs(self.players) do
 			player:draw(dt)
@@ -52,25 +54,20 @@ end
 function Game:drawMenu()
 	love.graphics.print("Press start...")
 end
-function Game:joystickreleased(joystick, button)
+function Game:gamepadreleased(joystick, button)
+	-- print(button)
 	if self.state == 1 then
-		if button == 8 then
+		if button == "start" then
 			self.state = 2
 		end
 	elseif self.state == 2 then
-		if button == 1 then
-			self.players[joystick:getID()]:keyreleased("a")
-		elseif button == 2 then
-			self.players[joystick:getID()]:keyreleased("b")
-		elseif button == 3 then
-			self.players[joystick:getID()]:keyreleased("x")
-		elseif button == 4 then
-			self.players[joystick:getID()]:keyreleased("y")
-		elseif button == 5 or button == 6 then
-			self.players[joystick:getID()]:shuffleOpponent()
+		if button == "rightshoulder" or button == "leftshoulder" then
+			self.players[joystick:getID()]:keyreleased("shoulder")
+		else
+			self.players[joystick:getID()]:keyreleased(button)
 		end
 	elseif self.state == 3 then
-		if button == 8 then
+		if button == "start" then
 			self:resetPlayers()
 			self.state = 2
 		end
@@ -78,8 +75,8 @@ function Game:joystickreleased(joystick, button)
 end
 function Game:keyreleased(key)
 	if self.state == 1 then
-		for _, player in ipairs(self.players) do
-			player:keyreleased(key)
+		if button == "start" then
+			self.state = 2
 		end
 	end
 end
@@ -92,10 +89,10 @@ function Game:showWinner()
 		end
 	end
 end
-function Game:shuffleOpponent(player)
+function Game:shuffleOpponent(playerID)
 	for _, p in ipairs(self.players) do
-		if p ~= player then
-			p:shuffleCombo()
+		if p.id ~= playerID then
+			p:shuffleCombination("current")
 		end
 	end
 end

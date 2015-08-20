@@ -1,17 +1,13 @@
-local Game = require 'game'
-local Player = require 'player'
+local Game = require 'class/game'
+local Player = require 'class/player'
 
 function love.load(arg)
     GAME = Game:new()
 
-    P1 = Player:new("Horseface", 100, 600)
-    P1:setKeys({"a", "b", "x", "y"}, "lctrl")
-    P1:shuffleCombo()
+    P1 = Player:new("Horseface", 100, 450)
     GAME:addPlayer(P1)
 
-    P2 = Player:new("Cotton Mouth", 330, 600)
-    P2:setKeys({"a", "b", "x", "y"}, "lctrl")
-    P2:shuffleCombo()
+    P2 = Player:new("Cotton Mouth", 500, 450)
     GAME:addPlayer(P2)
 end
 
@@ -30,6 +26,6 @@ function love.keyreleased(key)
     GAME:keyreleased(key)
 end
 
-function love.joystickreleased(joystick, button)
-    GAME:joystickreleased(joystick, button)
+function love.gamepadreleased(joystick, button)
+    GAME:gamepadreleased(joystick, button)
 end
