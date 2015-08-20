@@ -15,8 +15,8 @@ function love.update(dt)
     GAME:update(dt)
 end
 
-function love.draw(dt)
-    GAME:draw(dt)
+function love.draw()
+    GAME:draw()
 end
 
 function love.keyreleased(key)

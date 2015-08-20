@@ -14,16 +14,16 @@ function Player:initialize(name, x, y)
     self.modifier = "shoulder"
     self.combination_structure = {4, 7, 5}
     self.combinations = {}
+    self.pressed_button = {row=nil, column=nil, counter=0, total=1.5}
 
     self:shuffleCombination()
 end
-function Player:draw(dt)
+function Player:draw()
     if self.winner then
         love.graphics.setColor(0, 255, 0)
     else
         love.graphics.setColor(0, 255, 255)
     end
-
     local delta_x = -50
     local delta_y = 50
     love.graphics.polygon(
@@ -37,38 +37,19 @@ function Player:draw(dt)
 
     love.graphics.setColor(255, 255, 255, 255)
     for k, v in pairs(self.combinations) do
-        local line = ""
         if k <= self.state[1] then
             for kk, vv in pairs(self.combinations[k]) do
                 local x = self.x - 40 + kk * 37
                 local y = self.y - 15 + k * 37
+                if self.pressed_button.counter <= self.pressed_button.total then
+                    if self.pressed_button.row == k and self.pressed_button.column == kk then
+                        vv = vv .. "_pressed"
+                    end
+                end
                 love.graphics.draw(resources.BUTTONS[vv], x, y)
             end
-        else
-            line = "..."
         end
     end
-
-        --[[
-    for k, v in ipairs(self.combinations[self.state]) do
-        if v == "y" then
-            love.graphics.setColor(255, 208, 0)
-        elseif v == "b" then
-            love.graphics.setColor(235, 5, 5)
-        elseif v == "a" then
-            love.graphics.setColor(67, 196, 63)
-        elseif v == "x" then
-            love.graphics.setColor(48, 42, 242)
-        end
-        love.graphics.circle("fill", self.x + (k - 1) * 23, self.y + 43, 10);
-        v = string.upper(v)
-        love.graphics.print(v, self.x + ((k - 1) * 23) - 4, self.y + 36)
-
-        if k == self.state then
-            love.graphics.circle("fill", self.x + (k - 1) * 23, self.y + 58, 2)
-        end
-    end
-        ]]--
 end
 function Player:getNextKey()
     return self.combinations[self.state[1]][self.state[2]]
@@ -86,8 +67,10 @@ end
 function Player:changeState(state)
     if state == "hard" then
         self.state = {1, 1}
+        self:unsetPressedButton()
     elseif state == "soft" then
         self.state = {self.state[1], 1}
+        self:unsetPressedButton()
     elseif state == 1 then
         -- If state[2] + 1 is the latest, let's go to next state
         if self.state[2] + 1 > #self.combinations[self.state[1]] then
@@ -95,14 +78,29 @@ function Player:changeState(state)
             if self.state[1] + 1 > #self.combinations then
                 self.winner = true
             else
+                self:setPressedButton(self.state)
                 self.state = {self.state[1] + 1, 1}
             end
         else
+            self:setPressedButton(self.state)
             self.state[2] = self.state[2] + 1
         end
     end
 end
+function Player:setPressedButton(state)
+    self.pressed_button.row = state[1]
+    self.pressed_button.column = state[2]
+    self.pressed_button.counter = 0
+end
+function Player:unsetPressedButton()
+    self.pressed_button.row = nil
+    self.pressed_button.column = nil
+    self.pressed_button.counter = 0
+end
 function Player:update(dt)
+    if self.pressed_button.counter < self.pressed_button.total then
+        self.pressed_button.counter = self.pressed_button.counter + dt
+    end
 end
 function Player:shuffleCombination(kind)
     kind = kind or "all"

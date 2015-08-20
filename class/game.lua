@@ -18,8 +18,8 @@ end
 function Game:resetPlayers()
 	for _, player in ipairs(self.players) do
 		player.winner = false
-		player.state = 1
-		player:shuffleCombo()
+		player.state = {1, 1}
+		player:shuffleCombination()
 	end
 end
 function Game:update(dt)
@@ -32,7 +32,7 @@ function Game:update(dt)
 		end
 	end
 end
-function Game:draw(dt)
+function Game:draw()
 	if self.state == 1 then
 		Game:drawMenu()
 	elseif self.state == 2 then
@@ -45,7 +45,7 @@ function Game:draw(dt)
 	    love.graphics.line(0, self.ground, love.graphics.getWidth(), self.ground)
 
 		for _, player in ipairs(self.players) do
-			player:draw(dt)
+			player:draw()
 		end
 	elseif self.state == 3 then
 		self:showWinner()
